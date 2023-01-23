@@ -1,7 +1,11 @@
 package main
 
+import "time"
+
 func main() {
 	client := GetAuthedClient()
-	ReplyNotifications(client)
-	Translate([]string{"Test", "Hello"})
+	for true {
+		ReplyNotifications(client)
+		time.Sleep(time.Second * 60)
+	}
 }

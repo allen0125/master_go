@@ -53,10 +53,7 @@ func LingoCloud(payload *LingoCloudPayLoad) *LingoCloudResp {
 
 }
 
-func Translate(content []string) {
-	payload := &LingoCloudPayLoad{Source: content, TransType: "auto2zh", RequestID: "tootbot", Detect: true}
-	result := LingoCloud(payload)
-	for i := len(result.Target) - 1; i >= 0; i-- {
-		fmt.Println(result.Target[i])
-	}
+func Translate(content []string, transType string) []string {
+	payload := &LingoCloudPayLoad{Source: content, TransType: transType, RequestID: "tootbot", Detect: true}
+	return LingoCloud(payload).Target
 }

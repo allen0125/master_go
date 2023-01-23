@@ -25,20 +25,34 @@ func GetAuthedClient() *mastodon.Client {
 	return client
 }
 
-func ExtractContent(content string) {
+func ExtractContent(content string) string {
 	doc, err := goquery.NewDocumentFromReader(strings.NewReader(content))
 	if err != nil {
 		log.Fatal(err)
 	}
 	doc.Find("span").Remove()
 	text := doc.Find("p").Text()
-	fmt.Println(text)
+	return text
 }
 
-func ReplyNotification(notification *mastodon.Notification) {
+func ReplyNotification(client *mastodon.Client, notification *mastodon.Notification) {
 	if notification.Type == "mention" {
-		content := notification.Status.Content
-		ExtractContent(content)
+		if notification.Status.InReplyToID != nil {
+			statusID := mastodon.ID(fmt.Sprintf("%v", notification.Status.InReplyToID))
+			status, err := client.GetStatus(context.Background(), statusID)
+			if err != nil {
+				log.Fatal(err)
+			}
+			text := ExtractContent(status.Content)
+			result := Translate([]string{text}, "auto2zh")[0]
+			result = "@" + notification.Status.Account.Acct + " " + result
+			toot := &mastodon.Toot{InReplyToID: notification.Status.ID, Status: result}
+			newStatus, err := client.PostStatus(context.Background(), toot)
+			if err != nil {
+				log.Fatal(err)
+			}
+			fmt.Println(newStatus)
+		}
 	}
 }
 
@@ -49,6 +63,11 @@ func ReplyNotifications(client *mastodon.Client) {
 	}
 
 	for i := len(notifications) - 1; i >= 0; i-- {
-		ReplyNotification(notifications[i])
+		ReplyNotification(client, notifications[i])
+	}
+
+	err = client.ClearNotifications(context.Background())
+	if err != nil {
+		log.Fatal(err)
 	}
 }
