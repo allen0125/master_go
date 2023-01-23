@@ -3,6 +3,7 @@ package main
 import (
 	"bytes"
 	"encoding/json"
+	"fmt"
 	"io"
 	"log"
 	"net/http"
@@ -17,7 +18,13 @@ type LingoCloudPayLoad struct {
 	Detect    bool     `json:"detect"`
 }
 
-func LingoCloud(payload *LingoCloudPayLoad) string {
+type LingoCloudResp struct {
+	Target     []string `json:"target"`
+	RC         int8     `json:"rc"`
+	Confidence float32  `json:"confidence"`
+}
+
+func LingoCloud(payload *LingoCloudPayLoad) *LingoCloudResp {
 	url := "http://api.interpreter.caiyunai.com/v1/translator"
 	b, err := json.Marshal(payload)
 	if err != nil {
@@ -38,11 +45,18 @@ func LingoCloud(payload *LingoCloudPayLoad) string {
 		log.Fatal(err)
 	}
 
-	return string(bodyIO)
+	var lingoCloudResp LingoCloudResp
+	if err := json.Unmarshal(bodyIO, &lingoCloudResp); err != nil { // Parse []byte to go struct pointer
+		fmt.Println("Can not unmarshal JSON")
+	}
+	return &lingoCloudResp
 
 }
 
 func Translate(content []string) {
 	payload := &LingoCloudPayLoad{Source: content, TransType: "auto2zh", RequestID: "tootbot", Detect: true}
-	LingoCloud(payload)
+	result := LingoCloud(payload)
+	for i := len(result.Target) - 1; i >= 0; i-- {
+		fmt.Println(result.Target[i])
+	}
 }
