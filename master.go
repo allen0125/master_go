@@ -3,7 +3,6 @@ package main
 import (
 	"bytes"
 	"encoding/json"
-	"fmt"
 	"io"
 	"log"
 	"net/http"
@@ -47,7 +46,7 @@ func LingoCloud(payload *LingoCloudPayLoad) *LingoCloudResp {
 
 	var lingoCloudResp LingoCloudResp
 	if err := json.Unmarshal(bodyIO, &lingoCloudResp); err != nil { // Parse []byte to go struct pointer
-		fmt.Println("Can not unmarshal JSON")
+		log.Fatal("Can not unmarshal JSON")
 	}
 	return &lingoCloudResp
 
