@@ -44,7 +44,11 @@ func ReplyNotification(client *mastodon.Client, notification *mastodon.Notificat
 				log.Fatal(err)
 			}
 			text := ExtractContent(status.Content)
-			result := Translate([]string{text}, "auto2zh")[0]
+			result, err := gptTranslator(text)
+			if err != nil {
+				log.Fatal(err)
+				return
+			}
 			result = "@" + notification.Status.Account.Acct + " " + result
 			toot := &mastodon.Toot{InReplyToID: notification.Status.ID, Status: result}
 			newStatus, err := client.PostStatus(context.Background(), toot)

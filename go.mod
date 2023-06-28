@@ -10,6 +10,7 @@ require (
 require (
 	github.com/andybalholm/cascadia v1.3.1 // indirect
 	github.com/gorilla/websocket v1.5.0 // indirect
+	github.com/sashabaranov/go-openai v1.12.0 // indirect
 	github.com/tomnomnom/linkheader v0.0.0-20180905144013-02ca5825eb80 // indirect
 	golang.org/x/net v0.0.0-20210916014120-12bc252f5db8 // indirect
 )
